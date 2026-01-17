@@ -1,13 +1,21 @@
 #include "gt/gametank.h"
 #include "gt/gfx/draw_queue.h"
+#include "../gen/assets/cards.h"
 
 char box_x = 30, box_y = 20;
 char dx = 1, dy = 1;
 
+SpriteSlot testSlot;
+
+
 void main () {
+    testSlot = allocate_sprite(&ASSET__cards__gamtank_deck_bmp_load_list);
+
     while (1) {                                     //  Run forever
         queue_clear_screen(3);
-        queue_draw_box(box_x, box_y, 8, 8, 92);
+        //queue_draw_box(box_x, box_y, 8, 8, 92);
+
+        queue_draw_sprite(box_x, box_y, 16, 16, 16, 0, testSlot);
         queue_clear_border(0);
         
         box_x += dx;
@@ -24,7 +32,8 @@ void main () {
         }
  
         await_draw_queue();
-        await_vsync(1);
+        await_vsync(1
+        );
         flip_pages();
  
     }
