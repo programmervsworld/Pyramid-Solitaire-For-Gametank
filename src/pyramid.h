@@ -1,6 +1,7 @@
 #ifndef CARDS_H
 #define CARDS_H
 
+#include "input.h"
 #include "gt/feature/random/random.h"
 #include "../gen/assets/backgrounds.h"
 
@@ -81,6 +82,28 @@ void initializePyramidScene()
     loadPyramidBoard();
 }
 
+void checkInput()
+{
+    if (player1_new_buttons & INPUT_MASK_RIGHT)
+    {
+        if (cursorCard < 6)
+        {
+            cursorCard++;
+        }
+    }
+    else if (player1_new_buttons & INPUT_MASK_LEFT)
+    {
+        if (cursorCard > 0)
+        {
+            cursorCard--;
+        }
+    }
+    else if (player1_new_buttons & INPUT_MASK_A)
+    {
+        cursorCard++;
+    }
+}
+
 void renderPyramidBoard()
 {
     int rows, cols, cardx, cardy, counter;
@@ -88,8 +111,8 @@ void renderPyramidBoard()
     counter = 1;
     cardx = 64;
 
-    queue_draw_sprite(0,0,127,127,0,0,background);
-    //queue_draw_sprite_frame(background, 1, 1, 1, false);
+    queue_draw_sprite(0, 0, 127, 127, 0, 0, background);
+    // queue_draw_sprite_frame(background, 1, 1, 1, false);
 
     for (rows = 0; rows < 7; rows++)
     {
@@ -105,9 +128,10 @@ void renderPyramidBoard()
         {
             if (board[rows][cols] != 0)
             {
-                if(cursorRow == rows && cursorCard == cols){
-                    
-                    queue_draw_box(cardx-8, cardy-8, 16, 16, rnd_range(0,255));
+                if (cursorRow == rows && cursorCard == cols)
+                {
+
+                    queue_draw_box(cardx - 8, cardy - 8, 16, 16, rnd_range(0, 255));
                 }
 
                 queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols], false);
@@ -119,6 +143,8 @@ void renderPyramidBoard()
 
     queue_draw_sprite_frame(testSlot, DISCARD_PILE_X, DISCARD_PILE_Y, 0, false);
     queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
+
+    checkInput();
 }
 
 #endif

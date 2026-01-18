@@ -8,20 +8,21 @@
 #define CARD_HEIGHT 16
 #define CARD_WIDTH 16
 
-typedef enum {
+typedef enum
+{
     INTRO,
     PYRAMID
 } SceneType;
 
-typedef struct {
+typedef struct
+{
     void (*initialize)();
     void (*render)();
 } Scene;
 
 Scene pyramid = {
     &initializePyramidScene,
-    &renderPyramidBoard
-};
+    &renderPyramidBoard};
 
 Scene scenes[2];
 int currentScene = PYRAMID;
@@ -34,7 +35,7 @@ void main()
 
     //  Run forever
     while (1)
-    { 
+    {
         queue_clear_screen(3);
         queue_clear_border(0);
 
@@ -43,5 +44,6 @@ void main()
         await_draw_queue();
         await_vsync(1);
         flip_pages();
+        update_inputs();
     }
 }
