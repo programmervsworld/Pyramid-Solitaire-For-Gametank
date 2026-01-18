@@ -9,11 +9,21 @@
 #define FLIPPED_PILE_X 80
 #define FLIPPED_PILE_Y 112
 
+// Used as a value table for figuring out what cards total to 13
 int values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+
+// These two arrays just hold the cards positions in the tableau grid.
 int divx[] = {16, 32, 48, 64, 80, 96, 112};
 int divy[] = {16, 32, 48, 64, 80, 96, 112};
+
+// This is the playfield
 int board[7][7];
+
+// The is the deck that we deal from and where the next discard will come from
 int deck[52];
+int discardPtr = 0;
+int cursorRow = 6;
+int cursorCard = 0;
 
 SpriteSlot background;
 SpriteSlot testSlot;
@@ -30,6 +40,7 @@ void loadPyramidBoard()
         {
             board[r][c] = deck[num];
             num++;
+            discardPtr = num;
         }
         counter++;
     }
@@ -94,6 +105,11 @@ void renderPyramidBoard()
         {
             if (board[rows][cols] != 0)
             {
+                if(cursorRow == rows && cursorCard == cols){
+                    
+                    queue_draw_box(cardx-8, cardy-8, 16, 16, rnd_range(0,255));
+                }
+
                 queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols], false);
             }
             cardx += 16;
