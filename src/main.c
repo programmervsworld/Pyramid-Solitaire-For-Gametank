@@ -45,6 +45,7 @@ void main()
 
         num = 0;
         counter = 1;
+        cardx = 64;
 
         queue_clear_screen(3);
         queue_clear_border(0);
@@ -52,15 +53,16 @@ void main()
         for (rows = 0; rows < 7; rows++)
         {
             cardy = divy[rows];
-
+            
             if(rows != 0){
                 cardy -= rows * 4;
+                cardx = 64 - ((16 * rows)/2);
             }
            
             for (cols = 0; cols < counter; cols++)
             {
-                cardx = divx[cols];
                 queue_draw_sprite_frame(testSlot, cardx, cardy, deck[num], false);
+                cardx += 16;
                 num++;
             }
             counter++;
