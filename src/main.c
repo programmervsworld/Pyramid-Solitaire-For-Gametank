@@ -13,9 +13,23 @@ char dx = 1, dy = 1;
 char rows = PIXEL_WIDTH / CARD_WIDTH;
 char cols = PIXEL_HEIGHT / CARD_HEIGHT;
 int deck[52];
+int board[7][7];
 SpriteSlot testSlot;
 SpriteSlot textSlot;
 int frame = 1;
+
+void loadBoard(){
+    int r, c, num, counter;
+    num = 0;
+    counter = 1;
+    for(r = 0; r < 7; r++){
+        for(c = 0; c < counter; c++){
+            board[r][c] = deck[num];
+            num++;
+        }
+        counter++;
+    }
+}
 
 void setup()
 {
@@ -24,6 +38,7 @@ void setup()
     set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
     loadDeck(deck);
     shuffleDeck(deck);
+    loadBoard();
 }
 
 void incrementFrame()
@@ -61,37 +76,12 @@ void main()
            
             for (cols = 0; cols < counter; cols++)
             {
-                queue_draw_sprite_frame(testSlot, cardx, cardy, deck[num], false);
+                queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols], false);
                 cardx += 16;
                 num++;
             }
             counter++;
         }
-
-        // queue_draw_sprite_frame(testSlot, box_x, box_y, deck[frame], false);
-
-        /*box_x += dx;
-        box_y += dy;
-        if (box_x == 1)
-        {
-            dx = 1;
-            incrementFrame();
-        }
-        else if (box_x == 119)
-        {
-            dx = -1;
-            incrementFrame();
-        }
-        if (box_y == 8)
-        {
-            dy = 1;
-            incrementFrame();
-        }
-        else if (box_y == 112)
-        {
-            dy = -1;
-            incrementFrame();
-        }*/
 
         await_draw_queue();
         await_vsync(1);
