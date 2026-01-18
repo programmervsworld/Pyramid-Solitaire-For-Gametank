@@ -18,12 +18,15 @@ SpriteSlot testSlot;
 SpriteSlot textSlot;
 int frame = 1;
 
-void loadBoard(){
+void loadBoard()
+{
     int r, c, num, counter;
     num = 0;
     counter = 1;
-    for(r = 0; r < 7; r++){
-        for(c = 0; c < counter; c++){
+    for (r = 0; r < 7; r++)
+    {
+        for (c = 0; c < counter; c++)
+        {
             board[r][c] = deck[num];
             num++;
         }
@@ -56,9 +59,8 @@ void main()
 
     while (1)
     { //  Run forever
-        int rows, cols, cardx, cardy, num, counter;
+        int rows, cols, cardx, cardy, counter;
 
-        num = 0;
         counter = 1;
         cardx = 64;
 
@@ -68,17 +70,20 @@ void main()
         for (rows = 0; rows < 7; rows++)
         {
             cardy = divy[rows];
-            
-            if(rows != 0){
+
+            if (rows != 0)
+            {
                 cardy -= rows * 4;
-                cardx = 64 - ((16 * rows)/2);
+                cardx = 64 - ((16 * rows) / 2);
             }
-           
+
             for (cols = 0; cols < counter; cols++)
             {
-                queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols], false);
+                if (board[rows][cols] != 0)
+                {
+                    queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols], false);
+                }
                 cardx += 16;
-                num++;
             }
             counter++;
         }
