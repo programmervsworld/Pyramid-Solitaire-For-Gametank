@@ -12,7 +12,6 @@ char box_x = 30, box_y = 20;
 char dx = 1, dy = 1;
 char rows = PIXEL_WIDTH / CARD_WIDTH;
 char cols = PIXEL_HEIGHT / CARD_HEIGHT;
-int deck[52];
 int board[7][7];
 SpriteSlot testSlot;
 SpriteSlot textSlot;
