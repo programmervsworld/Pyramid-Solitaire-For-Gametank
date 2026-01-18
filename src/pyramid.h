@@ -100,6 +100,9 @@ void renderPyramidBoard()
         }
         counter++;
     }
+
+    queue_draw_sprite_frame(testSlot, DISCARD_PILE_X, DISCARD_PILE_Y, 0, false);
+    queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
 }
 
 #endif
