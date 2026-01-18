@@ -2,6 +2,7 @@
 #define CARDS_H
 
 #include "gt/feature/random/random.h"
+#include "../gen/assets/backgrounds.h"
 
 #define DISCARD_PILE_X 48
 #define DISCARD_PILE_Y 112
@@ -14,9 +15,9 @@ int divy[] = {16, 32, 48, 64, 80, 96, 112};
 int board[7][7];
 int deck[52];
 
+SpriteSlot background;
 SpriteSlot testSlot;
 SpriteSlot textSlot;
-
 
 void loadPyramidBoard()
 {
@@ -58,9 +59,12 @@ void shufflePyramidDeck(int cards[])
     }
 }
 
-void initializePyramidScene(){
+void initializePyramidScene()
+{
+    background = allocate_sprite(&ASSET__backgrounds__background_bmp_load_list);
     testSlot = allocate_sprite(&ASSET__cardframes__frame_deck_bmp_load_list);
     set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
+    set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
     loadPyramidDeck(deck);
     shufflePyramidDeck(deck);
     loadPyramidBoard();
@@ -72,6 +76,9 @@ void renderPyramidBoard()
 
     counter = 1;
     cardx = 64;
+
+    queue_draw_sprite(0,0,127,127,0,0,background);
+    //queue_draw_sprite_frame(background, 1, 1, 1, false);
 
     for (rows = 0; rows < 7; rows++)
     {

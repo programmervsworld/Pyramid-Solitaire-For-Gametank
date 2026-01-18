@@ -26,20 +26,15 @@ Scene pyramid = {
 Scene scenes[2];
 int currentScene = PYRAMID;
 
-void setup()
-{
-    scenes[currentScene].initialize();
-}
-
 void main()
 {
     scenes[1] = pyramid;
 
-    setup();
+    scenes[currentScene].initialize();
 
+    //  Run forever
     while (1)
-    { //  Run forever
-
+    { 
         queue_clear_screen(3);
         queue_clear_border(0);
 
