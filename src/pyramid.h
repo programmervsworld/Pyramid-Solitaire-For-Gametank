@@ -6,6 +6,7 @@
 #include "../gen/assets/backgrounds.h"
 #include "gt/feature/text/text.h"
 
+
 #define DISCARD_PILE_X 48
 #define DISCARD_PILE_Y 112
 #define FLIPPED_PILE_X 80
@@ -27,14 +28,34 @@ int deck[52];
 int discardPtr = 0;
 int cursorRow = 6;
 int cursorCard = 0;
+int numSelections = 0;
 bool isOnBoard = true;
-bool isOnDiscard = false;
+bool isOnDiscard = true;
 
 SpriteSlot background;
 SpriteSlot testSlot;
 SpriteSlot textSlot;
 
 char *selectionText = "Selected Card 1: ";
+
+void breakpoint() {}
+
+void removeCardFromBoard(int cardNo)
+{
+    int rows, cols;
+
+    for (rows = 0; rows < 7; rows++)
+    {
+        for (cols = 0; cols < 7; cols++)
+        {
+            if (board[rows][cols] == cardNo)
+            {
+                board[rows][cols] = 0;
+                return;
+            }
+        }
+    }
+}
 
 void loadPyramidBoard()
 {
@@ -86,6 +107,16 @@ void draw_selection()
     text_print_string(selectionText);
 }
 
+int getvalue(int cardno)
+{
+    int value = cardno % 13;
+    if (value == 0)
+    {
+        value = cardno;
+    }
+    return value;
+}
+
 void initializePyramidScene()
 {
     background = allocate_sprite(&ASSET__backgrounds__background_bmp_load_list);
@@ -96,6 +127,60 @@ void initializePyramidScene()
     shufflePyramidDeck(deck);
     loadPyramidBoard();
 }
+
+void resetSelections()
+{
+    int rows, cols;
+
+    for (rows = 0; rows < 7; rows++)
+    {
+        for (cols = 0; cols < 7; cols++)
+        {
+            select[rows][cols] = 0;
+        }
+    }
+}
+void checkSelection()
+{
+    int cardOne, cardTwo, rows, cols, value1, value2;
+    cardOne = 0;
+    cardTwo = 0;
+    value1 = 0;
+    value2 = 0;
+    for (rows = 0; rows < 7; rows++)
+    {
+        for (cols = 0; cols < 7; cols++)
+        {
+            if (select[rows][cols] == 1)
+            {
+                if (cardOne == 0)
+                {
+                    cardOne = board[rows][cols];
+                    value1 = getvalue(cardOne+1);
+                }
+                else
+                {
+                    cardTwo = board[rows][cols];
+                    value2 = getvalue(cardTwo+1);
+                }
+                //select[rows][cols] = 0;
+            }
+        }
+    }
+
+    if(value1 == 13){
+        removeCardFromBoard(cardOne);
+        resetSelections();
+    }else if(13 == (value1 + value2)){
+        removeCardFromBoard(cardOne);
+        removeCardFromBoard(cardTwo);
+        resetSelections();
+    }   
+}
+
+
+
+
 
 void checkInput()
 {
@@ -137,9 +222,21 @@ void checkInput()
     }
     else if (player1_new_buttons & INPUT_MASK_A)
     {
-        selectionText = "Wow!";
+        if(numSelections < 2){
+            select[cursorRow][cursorCard] = 1;
+            numSelections++;
+        } else {
+            resetSelections();
+            numSelections = 0;
+            select[cursorRow][cursorCard] = 1;
+            numSelections++;
+        }
+        checkSelection();
     }
 }
+
+
+
 
 void renderPyramidBoard()
 {
@@ -174,10 +271,12 @@ void renderPyramidBoard()
                 // If the card we are is has a selection flag on it
                 if (select[rows][cols])
                 {
-                    cardy = cardy + 8;
+                    queue_draw_sprite_frame(testSlot, cardx, cardy + 8, board[rows][cols], false);
                 }
-
-                queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols], false);
+                else
+                {
+                    queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols], false);
+                }
             }
             cardx += 16;
         }
@@ -197,6 +296,7 @@ void renderPyramidBoard()
     queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
 
     checkInput();
+    //checkSelection();
 }
 
 #endif
