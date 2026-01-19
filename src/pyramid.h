@@ -6,7 +6,6 @@
 #include "../gen/assets/backgrounds.h"
 #include "gt/feature/text/text.h"
 
-
 #define DISCARD_PILE_X 48
 #define DISCARD_PILE_Y 112
 #define FLIPPED_PILE_X 80
@@ -139,6 +138,7 @@ void resetSelections()
             select[rows][cols] = 0;
         }
     }
+    numSelections = 0;
 }
 void checkSelection()
 {
@@ -156,31 +156,30 @@ void checkSelection()
                 if (cardOne == 0)
                 {
                     cardOne = board[rows][cols];
-                    value1 = getvalue(cardOne+1);
+                    value1 = getvalue(cardOne + 1);
                 }
                 else
                 {
                     cardTwo = board[rows][cols];
-                    value2 = getvalue(cardTwo+1);
+                    value2 = getvalue(cardTwo + 1);
                 }
-                //select[rows][cols] = 0;
+                // select[rows][cols] = 0;
             }
         }
     }
 
-    if(value1 == 13){
+    if (value1 == 13)
+    {
         removeCardFromBoard(cardOne);
         resetSelections();
-    }else if(13 == (value1 + value2)){
+    }
+    else if (13 == (value1 + value2))
+    {
         removeCardFromBoard(cardOne);
         removeCardFromBoard(cardTwo);
         resetSelections();
-    }   
+    }
 }
-
-
-
-
 
 void checkInput()
 {
@@ -220,23 +219,27 @@ void checkInput()
     {
         isOnBoard = true;
     }
+    else if (player1_new_buttons & INPUT_MASK_B)
+    {
+        resetSelections();
+    }
     else if (player1_new_buttons & INPUT_MASK_A)
     {
-        if(numSelections < 2){
+        if (numSelections < 2)
+        {
             select[cursorRow][cursorCard] = 1;
             numSelections++;
-        } else {
+        }
+        else
+        {
             resetSelections();
-            numSelections = 0;
+            
             select[cursorRow][cursorCard] = 1;
             numSelections++;
         }
         checkSelection();
     }
 }
-
-
-
 
 void renderPyramidBoard()
 {
@@ -296,7 +299,7 @@ void renderPyramidBoard()
     queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
 
     checkInput();
-    //checkSelection();
+    // checkSelection();
 }
 
 #endif

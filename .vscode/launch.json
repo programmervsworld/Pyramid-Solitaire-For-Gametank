@@ -8,9 +8,10 @@
             "name": "Make Emulate",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/usr/bin/make",
+            "program": "/bin/bash",
             "args": [
-                "emulate"
+                "-lc",
+                "make clean && make emulate"
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
