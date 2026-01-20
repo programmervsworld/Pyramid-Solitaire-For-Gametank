@@ -40,6 +40,64 @@ char *selectionText = "Selected Card 1: ";
 
 void breakpoint() {}
 
+void moveRight() {
+  bool searching = true;
+  if (isOnBoard) {
+
+    while (searching) {
+
+      cursorCard++;
+
+      if (cursorCard > 6) {
+        cursorCard = 0;
+      }
+
+      if (cursorRow < 6 && board[cursorRow + 1][cursorCard] > 0) {
+        cursorRow++;
+      }
+
+      if (board[cursorRow][cursorCard] > 0) {
+        searching = false;
+      } else {
+        if (board[cursorRow][cursorCard + 1] == 0) {
+          cursorRow--;
+          searching = false;
+        }
+      }
+    }
+  } else {
+    isOnDiscard = false;
+  }
+}
+
+void moveLeft() {
+  bool searching = true;
+  if (isOnBoard) {
+    while (searching) {
+      if (cursorCard == 0) {
+        cursorCard = 7;
+      } else {
+        cursorCard--;
+      }
+
+      if (cursorRow < 6 && board[cursorRow - 1][cursorCard] > 0) {
+        cursorRow++;
+      }
+
+      if (board[cursorRow][cursorCard] > 0) {
+        searching = false;
+      } else {
+        if (board[cursorRow][cursorCard - 1] == 0) {
+          cursorRow--;
+          searching = false;
+        }
+      }
+    }
+  } else {
+    isOnDiscard = true;
+  }
+}
+
 void iterateBoard(void (*execute)(int row, int col, int search), int search) {
   int rows, cols;
 
@@ -62,7 +120,7 @@ void canSelect(int row, int col, int search) {
   if (row == 7 && board[row][col] > 0) {
     select[row][col] |= 2;
   } else {
-    select[row][col] = 0;
+    select[row][col] |= 2;
   }
 }
 
@@ -71,10 +129,7 @@ void resetSelections() {
   numSelections = 0;
 }
 
-void removeCardFromBoard(int cardNo) {
-  void (*function_ptr)(int, int, int) = removeCard;
-  iterateBoard(removeCard, cardNo);
-}
+void removeCardFromBoard(int cardNo) { iterateBoard(removeCard, cardNo); }
 
 void determineSelectability() { iterateBoard(canSelect, 0); }
 
@@ -140,8 +195,6 @@ void initializePyramidScene() {
   determineSelectability();
 }
 
-void findNextPosition() {}
-
 void checkSelection() {
   int cardOne, cardTwo, rows, cols, value1, value2;
   cardOne = 0;
@@ -167,33 +220,26 @@ void checkSelection() {
     removeCardFromBoard(cardOne);
     resetSelections();
     determineSelectability();
-    findNextPosition();
+    if (isOnBoard) {
+      moveRight();
+    }
+
   } else if (13 == (value1 + value2)) {
     removeCardFromBoard(cardOne);
     removeCardFromBoard(cardTwo);
     resetSelections();
     determineSelectability();
-    findNextPosition();
+    if (isOnBoard) {
+      moveRight();
+    }
   }
 }
 
 void checkInput() {
   if (player1_new_buttons & INPUT_MASK_RIGHT) {
-    if (isOnBoard) {
-      if (cursorCard < 6) {
-        cursorCard++;
-      }
-    } else {
-      isOnDiscard = false;
-    }
+    moveRight();
   } else if (player1_new_buttons & INPUT_MASK_LEFT) {
-    if (isOnBoard) {
-      if (cursorCard > 0) {
-        cursorCard--;
-      }
-    } else {
-      isOnDiscard = true;
-    }
+    moveLeft();
   } else if (player1_new_buttons & INPUT_MASK_DOWN) {
     isOnBoard = false;
   } else if (player1_new_buttons & INPUT_MASK_UP) {
