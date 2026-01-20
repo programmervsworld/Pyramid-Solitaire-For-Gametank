@@ -197,7 +197,7 @@ void initializePyramidScene() {
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
   loadPyramidDeck(deck);
-  shufflePyramidDeck(deck, 5);
+  shufflePyramidDeck(deck, 7);
   loadPyramidBoard();
   resetSelections();
   determineSelectability();
@@ -326,13 +326,6 @@ void renderPyramidBoard() {
   queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
 
   checkInput();
-
-  text_print_line_start = 10;
-  text_cursor_y = 10;
-  text_cursor_x = 10;
-  text_print_width = 64;
-  text_print_string("hello");
-
 
 }
 
