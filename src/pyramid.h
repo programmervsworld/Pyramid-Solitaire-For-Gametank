@@ -56,6 +56,12 @@ void moveRight() {
         cursorRow++;
       }
 
+      if(cursorRow < 6 && board[cursorRow + 1][cursorCard + 1] > 0){
+        cursorRow++;
+        cursorCard++;
+        searching = false;
+      }
+
       if (board[cursorRow][cursorCard] > 0) {
         searching = false;
       } else {
@@ -80,14 +86,14 @@ void moveLeft() {
         cursorCard--;
       }
 
-      if (cursorRow < 6 && board[cursorRow - 1][cursorCard] > 0) {
+      if (cursorRow < 6 && board[cursorRow + 1][cursorCard] > 0) {
         cursorRow++;
       }
 
       if (board[cursorRow][cursorCard] > 0) {
         searching = false;
       } else {
-        if (board[cursorRow][cursorCard - 1] == 0) {
+        if (board[cursorRow][cursorCard - 1] == 0 && board[cursorRow][cursorCard - 2] == 0) {
           cursorRow--;
           searching = false;
         }
