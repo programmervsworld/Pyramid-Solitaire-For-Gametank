@@ -29,6 +29,8 @@ int discardPtr = 0;
 int cursorRow = 6;
 int cursorCard = 0;
 int numSelections = 0;
+int deckflips = 0;
+
 bool isOnBoard = true;
 bool isOnDiscard = true;
 
@@ -72,7 +74,7 @@ void moveRight() {
       }
     }
   } else {
-    isOnDiscard = false;
+    isOnDiscard = true;
   }
 }
 
@@ -101,6 +103,26 @@ void moveLeft() {
     }
   } else {
     isOnDiscard = true;
+  }
+}
+
+void advanceNextDiscard(){
+  bool searching = true;
+  
+  while(searching){
+    if(deckflips == 3){
+      searching = false;
+      break;
+      //Game over
+    }
+    if(discardPtr + 1 == 51){
+      discardPtr = 27;
+      deckflips++;
+    }
+    if(deck[discardPtr] > 0){
+      searching = false;
+    }
+    discardPtr++;
   }
 }
 
@@ -256,8 +278,10 @@ void checkInput() {
     moveLeft();
   } else if (player1_new_buttons & INPUT_MASK_DOWN) {
     isOnBoard = false;
+    isOnDiscard = true;
   } else if (player1_new_buttons & INPUT_MASK_UP) {
     isOnBoard = true;
+    isOnDiscard = false;
   } else if (player1_new_buttons & INPUT_MASK_B) {
     resetSelections();
   } else if (player1_new_buttons & INPUT_MASK_A) {
@@ -271,6 +295,8 @@ void checkInput() {
       numSelections++;
     }
     checkSelection();
+  }else if(player1_new_buttons & INPUT_MASK_C){
+    advanceNextDiscard();
   }
 }
 
@@ -281,10 +307,7 @@ void renderPyramidBoard() {
   cardx = 64;
 
   queue_draw_sprite(0, 0, 127, 127, 0, 0, background);
-  // queue_draw_sprite_frame(background, 1, 1, 1, false);
   
-
-
   for (rows = 0; rows < 7; rows++) {
     cardy = divy[rows];
 
@@ -315,15 +338,18 @@ void renderPyramidBoard() {
   }
 
   if (!isOnBoard && isOnDiscard) {
-    queue_draw_box(DISCARD_PILE_X - 8, DISCARD_PILE_Y - 8, 16, 16,
+     queue_draw_box(FLIPPED_PILE_X - 8, FLIPPED_PILE_Y - 8, 16, 16,
                    rnd_range(0, 255));
-  } else if (!isOnBoard && !isOnDiscard) {
-    queue_draw_box(FLIPPED_PILE_X - 8, FLIPPED_PILE_Y - 8, 16, 16,
-                   rnd_range(0, 255));
-  }
+  } 
 
   queue_draw_sprite_frame(testSlot, DISCARD_PILE_X, DISCARD_PILE_Y, 0, false);
-  queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
+  if(discardPtr > 24){
+    queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, deck[discardPtr], false);
+  }else{
+    queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
+  }
+  
+  
 
   checkInput();
 
