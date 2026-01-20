@@ -33,7 +33,9 @@ void main() {
     scenes[currentScene].render();
 
     await_draw_queue();
+
     await_vsync(1);
+    
     flip_pages();
     update_inputs();
   }

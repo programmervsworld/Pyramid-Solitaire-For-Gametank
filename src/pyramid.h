@@ -154,16 +154,18 @@ void loadPyramidDeck(int deck[]) {
   }
 }
 
-void shufflePyramidDeck(int cards[]) {
+void shufflePyramidDeck(int cards[], int times) {
   int valueToSwap;
   int indexToSwap;
-  int i;
+  int i, t;
 
-  for (i = 0; i < 51; i++) {
-    indexToSwap = rnd_range(1, 50);
-    valueToSwap = cards[indexToSwap];
-    cards[indexToSwap] = cards[1];
-    cards[1] = valueToSwap;
+  for (t = 0; t < times; t++) {
+    for (i = 0; i < 51; i++) {
+      indexToSwap = rnd_range(1, 50);
+      valueToSwap = cards[indexToSwap];
+      cards[indexToSwap] = cards[1];
+      cards[1] = valueToSwap;
+    }
   }
 }
 
@@ -189,10 +191,16 @@ void initializePyramidScene() {
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
   loadPyramidDeck(deck);
-  shufflePyramidDeck(deck);
+  shufflePyramidDeck(deck, 5);
   loadPyramidBoard();
   resetSelections();
   determineSelectability();
+
+  text_init();
+  text_load_font();
+  text_color = TEXT_COLOR_BLACK;
+  text_print_line_start = 10;
+  text_print_width = 128;
 }
 
 void checkSelection() {
@@ -268,6 +276,8 @@ void renderPyramidBoard() {
 
   queue_draw_sprite(0, 0, 127, 127, 0, 0, background);
   // queue_draw_sprite_frame(background, 1, 1, 1, false);
+  
+
 
   for (rows = 0; rows < 7; rows++) {
     cardy = divy[rows];
@@ -310,7 +320,14 @@ void renderPyramidBoard() {
   queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
 
   checkInput();
-  // checkSelection();
+
+  text_print_line_start = 10;
+  text_cursor_y = 10;
+  text_cursor_x = 10;
+  text_print_width = 64;
+  text_print_string("hello");
+
+
 }
 
 #endif
