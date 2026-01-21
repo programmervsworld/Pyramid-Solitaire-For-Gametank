@@ -10,6 +10,7 @@
 #define DISCARD_PILE_Y 112
 #define FLIPPED_PILE_X 80
 #define FLIPPED_PILE_Y 112
+#define RANDOM_SEED 7
 #define CHECK_BIT(var, pos) ((var >> pos) & 1)
 
 // Used as a value table for figuring out what cards total to 13
@@ -33,6 +34,7 @@ int deckflips = 0;
 
 bool isOnBoard = true;
 bool isOnDiscard = true;
+bool flipIsSelected = false;
 
 SpriteSlot background;
 SpriteSlot testSlot;
@@ -83,7 +85,7 @@ void moveLeft() {
   if (isOnBoard) {
     while (searching) {
       if (cursorCard == 0) {
-        cursorCard = 7;
+        cursorCard = 6;
       } else {
         cursorCard--;
       }
@@ -95,7 +97,7 @@ void moveLeft() {
       if (board[cursorRow][cursorCard] > 0) {
         searching = false;
       } else {
-        if (board[cursorRow][cursorCard - 1] == 0 && board[cursorRow][cursorCard - 2] == 0) {
+        if (board[cursorRow][cursorCard - 1] == 0 && board[cursorRow-1][cursorCard - 1] > 0) {
           cursorRow--;
           searching = false;
         }
@@ -219,7 +221,7 @@ void initializePyramidScene() {
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
   loadPyramidDeck(deck);
-  shufflePyramidDeck(deck, 7);
+  shufflePyramidDeck(deck, RANDOM_SEED);
   loadPyramidBoard();
   resetSelections();
   determineSelectability();
@@ -286,13 +288,25 @@ void checkInput() {
     resetSelections();
   } else if (player1_new_buttons & INPUT_MASK_A) {
     if (numSelections < 2) {
-      select[cursorRow][cursorCard] = 1;
-      numSelections++;
+      if(isOnDiscard){
+        flipIsSelected = true;
+        numSelections++;
+      }else{
+        flipIsSelected = false;
+        select[cursorRow][cursorCard] = 1;
+        numSelections++;
+      }
     } else {
       resetSelections();
 
-      select[cursorRow][cursorCard] = 1;
-      numSelections++;
+      if(isOnDiscard){
+        flipIsSelected = true;
+        numSelections++;
+      }else{
+        flipIsSelected = false;
+        select[cursorRow][cursorCard] = 1;
+        numSelections++;
+      }
     }
     checkSelection();
   }else if(player1_new_buttons & INPUT_MASK_C){
