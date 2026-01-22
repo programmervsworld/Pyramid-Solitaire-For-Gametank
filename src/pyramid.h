@@ -81,6 +81,44 @@ void moveRight() {
   }
 }
 
+int findSelectableRowAboveMe(int cardPos) {
+  int i;
+  for (i = 6; i >= 0; i--) {
+    if (board[i][cardPos] > 0) {
+      if (i < 6 && board[i + 1][cardPos + 1] == 0) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+void moveLeftRedux() {
+  bool searching = true;
+  int nextSelectableRow;
+  if (isOnBoard) {
+    while (searching) {
+      if (cursorCard-- < 0) {
+        cursorCard = 6;
+      }
+      if (board[cursorRow][cursorCard] == 0 && cursorCard < 6) {
+        nextSelectableRow = findSelectableRowAboveMe(cursorCard);
+        if (nextSelectableRow > -1) {
+          cursorRow = nextSelectableRow;
+          searching = false;
+        }
+      } else {
+        if (cursorRow < 6 && board[cursorRow + 1][cursorCard] > 0) {
+          cursorRow++;
+          searching = false;
+        } else {
+          searching = false;
+        }
+      }
+    }
+  }
+}
+
 void moveLeft() {
   bool searching = true;
   if (isOnBoard) {
@@ -310,7 +348,7 @@ void checkInput() {
   if (player1_new_buttons & INPUT_MASK_RIGHT) {
     moveRight();
   } else if (player1_new_buttons & INPUT_MASK_LEFT) {
-    moveLeft();
+    moveLeftRedux();
   } else if (player1_new_buttons & INPUT_MASK_DOWN) {
     isOnBoard = false;
     isOnDiscard = true;
