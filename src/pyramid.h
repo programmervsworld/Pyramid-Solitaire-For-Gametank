@@ -10,6 +10,7 @@
 #define DISCARD_PILE_Y 112
 #define FLIPPED_PILE_X 80
 #define FLIPPED_PILE_Y 112
+#define DISCARD_BEGINS 27
 #define RANDOM_SEED 7
 #define CHECK_BIT(var, pos) ((var >> pos) & 1)
 
@@ -147,7 +148,7 @@ void advanceNextDiscard()
     }
     if (discardPtr + 1 == 51)
     {
-      discardPtr = 27;
+      discardPtr = DISCARD_BEGINS;
       deckflips++;
     }
     if (deck[discardPtr] > 0)
@@ -215,10 +216,10 @@ void loadPyramidBoard()
     {
       board[r][c] = deck[num];
       num++;
-      discardPtr = num;
     }
     counter++;
   }
+  discardPtr = DISCARD_BEGINS;
 }
 
 void loadPyramidDeck(int deck[])
@@ -463,7 +464,7 @@ void checkSelection()
     }
 
     queue_draw_sprite_frame(testSlot, DISCARD_PILE_X, DISCARD_PILE_Y, 0, false);
-    if (discardPtr > 24)
+    if (discardPtr > DISCARD_BEGINS)
     {
       if(flipIsSelected){
         queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X + 8, FLIPPED_PILE_Y, deck[discardPtr], false);
