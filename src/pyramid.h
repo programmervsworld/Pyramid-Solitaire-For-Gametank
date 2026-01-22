@@ -178,7 +178,11 @@ void resetSelections() {
   flipIsSelected = false;
 }
 
-void removeCardFromBoard(int cardNo) { iterateBoard(removeCard, cardNo); }
+void removeCardFromBoard(int cardNo) {
+  if (cardNo > 0) {
+    iterateBoard(removeCard, cardNo);
+  }
+}
 
 void determineSelectability() { iterateBoard(canSelect, 0); }
 
@@ -229,7 +233,7 @@ void draw_selection() {
 int getvalue(int cardno) {
   int value = cardno % 13;
   if (value == 0) {
-    value = cardno;
+    value = 13;
   }
   return value;
 }
@@ -279,19 +283,20 @@ void checkSelection() {
     total = value1 + getvalue(deck[discardPtr] + 1);
   }
 
-  if (value1 == 13) {
+  /*if (value1 == 13) {
     removeCardFromBoard(cardOne);
     resetSelections();
     determineSelectability();
     if (isOnBoard) {
       moveRight();
     }
-  } else if (13 == total) {
+  } else */
+  if (13 == total) {
     removeCardFromBoard(cardOne);
     removeCardFromBoard(cardTwo);
     if (flipIsSelected) {
+      deck[discardPtr] = 0;
       moveBackDiscard();
-      // deck[discardPtr] = 0;
     }
     resetSelections();
     determineSelectability();
