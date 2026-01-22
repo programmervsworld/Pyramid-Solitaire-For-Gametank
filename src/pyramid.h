@@ -151,7 +151,7 @@ void advanceNextDiscard()
       discardPtr = DISCARD_BEGINS;
       deckflips++;
     }
-    if (deck[discardPtr] > 0)
+    if (deck[discardPtr+1] > 0)
     {
       searching = false;
     }
@@ -222,7 +222,7 @@ void loadPyramidBoard()
   discardPtr = DISCARD_BEGINS;
 }
 
-void loadPyramidDeck(int deck[])
+void loadPyramidDeck(int * deck[])
 {
   int i = 0;
   for (i = 1; i < 52; i++)
@@ -231,7 +231,7 @@ void loadPyramidDeck(int deck[])
   }
 }
 
-void shufflePyramidDeck(int cards[], int times)
+void shufflePyramidDeck(int *cards[], int times)
 {
   int valueToSwap;
   int indexToSwap;
@@ -274,8 +274,8 @@ void initializePyramidScene()
   testSlot = allocate_sprite(&ASSET__cardframes__frame_deck_bmp_load_list);
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
-  loadPyramidDeck(deck);
-  shufflePyramidDeck(deck, RANDOM_SEED);
+  loadPyramidDeck(&deck);
+  shufflePyramidDeck(&deck, RANDOM_SEED);
   loadPyramidBoard();
   resetSelections();
   determineSelectability();
