@@ -45,42 +45,6 @@ char *selectionText = "Selected Card 1: ";
 
 void breakpoint() {}
 
-void moveRight() {
-  bool searching = true;
-  if (isOnBoard) {
-
-    while (searching) {
-
-      cursorCard++;
-
-      if (cursorCard > 6) {
-        cursorCard = 0;
-      }
-
-      if (cursorRow < 6 && board[cursorRow + 1][cursorCard] > 0) {
-        cursorRow++;
-      }
-
-      if (cursorRow < 6 && board[cursorRow + 1][cursorCard + 1] > 0) {
-        cursorRow++;
-        cursorCard++;
-        searching = false;
-      }
-
-      if (board[cursorRow][cursorCard] > 0) {
-        searching = false;
-      } else {
-        if (board[cursorRow][cursorCard + 1] == 0) {
-          cursorRow--;
-          searching = false;
-        }
-      }
-    }
-  } else {
-    isOnDiscard = true;
-  }
-}
-
 int findSelectableRowAboveMe(int cardPos) {
   int i;
   for (i = 6; i >= 0; i--) {
@@ -93,12 +57,37 @@ int findSelectableRowAboveMe(int cardPos) {
   return -1;
 }
 
+void moveRightRedux() {
+  bool searching = true;
+  int nextSelectableRow;
+  if (isOnBoard) {
+    while (searching) {
+      if (cursorCard++ > 5) {
+        cursorCard = 0;
+      }
+      if (board[cursorRow][cursorCard] == 0 && cursorCard < 6) {
+        nextSelectableRow = findSelectableRowAboveMe(cursorCard);
+        if (nextSelectableRow > -1) {
+          cursorRow = nextSelectableRow;
+          searching = false;
+        }
+      } else {
+        if (cursorRow < 6 && board[cursorRow + 1][cursorCard + 1] > 0) {
+          cursorRow++;
+        } else {
+          searching = false;
+        }
+      }
+    }
+  }
+}
+
 void moveLeftRedux() {
   bool searching = true;
   int nextSelectableRow;
   if (isOnBoard) {
     while (searching) {
-      if (cursorCard-- < 0) {
+      if (cursorCard-- <= 0) {
         cursorCard = 6;
       }
       if (board[cursorRow][cursorCard] == 0 && cursorCard < 6) {
@@ -116,35 +105,6 @@ void moveLeftRedux() {
         }
       }
     }
-  }
-}
-
-void moveLeft() {
-  bool searching = true;
-  if (isOnBoard) {
-    while (searching) {
-      if (cursorCard == 0) {
-        cursorCard = 6;
-      } else {
-        cursorCard--;
-      }
-
-      if (cursorRow < 6 && board[cursorRow + 1][cursorCard] > 0) {
-        cursorRow++;
-      }
-
-      if (board[cursorRow][cursorCard] > 0) {
-        searching = false;
-      } else {
-        if (board[cursorRow][cursorCard - 1] == 0 &&
-            board[cursorRow - 1][cursorCard - 1] > 0) {
-          cursorRow--;
-          searching = false;
-        }
-      }
-    }
-  } else {
-    isOnDiscard = true;
   }
 }
 
@@ -339,14 +299,14 @@ void checkSelection() {
     resetSelections();
     determineSelectability();
     if (isOnBoard) {
-      moveRight();
+      moveRightRedux();
     }
   }
 }
 
 void checkInput() {
   if (player1_new_buttons & INPUT_MASK_RIGHT) {
-    moveRight();
+    moveRightRedux();
   } else if (player1_new_buttons & INPUT_MASK_LEFT) {
     moveLeftRedux();
   } else if (player1_new_buttons & INPUT_MASK_DOWN) {
@@ -401,11 +361,12 @@ void renderPyramidBoard() {
     }
 
     for (cols = 0; cols < counter; cols++) {
+      if (cursorRow == rows && cursorCard == cols && isOnBoard) {
+        queue_draw_box(cardx - 8, cardy - 8, 16, 16, rnd_range(0, 255));
+      }
+
       if (board[rows][cols] != 0) {
         // If the cursor is currently over this
-        if (cursorRow == rows && cursorCard == cols && isOnBoard) {
-          queue_draw_box(cardx - 8, cardy - 8, 16, 16, rnd_range(0, 255));
-        }
 
         // If the card we are is has a selection flag on it
         if (select[rows][cols] & 1) {
