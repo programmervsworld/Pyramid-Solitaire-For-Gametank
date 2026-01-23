@@ -30,7 +30,11 @@ void main() {
     queue_clear_screen(3);
     queue_clear_border(0);
 
-    scenes[currentScene].render();
+    if(!hasWon()){
+      scenes[currentScene].render();
+    }else{
+      
+    }
 
     await_draw_queue();
 

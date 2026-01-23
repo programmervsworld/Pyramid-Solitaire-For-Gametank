@@ -2,6 +2,7 @@
 #define CARDS_H
 
 #include "../gen/assets/backgrounds.h"
+#include "../gen/assets/numbers.h"
 #include "gt/feature/random/random.h"
 #include "gt/feature/text/text.h"
 #include "input.h"
@@ -13,6 +14,8 @@
 #define DISCARD_BEGINS 27
 #define RANDOM_SEED 9
 #define SELECT_SHIFT 5
+#define SCORE_X 103
+#define SCORE_Y 17
 
 typedef struct {
   int row;
@@ -40,6 +43,7 @@ int eligPos = 0;
 int eligCount = 7;
 int numSelections = 0;
 int deckflips = 0;
+char remainingCardCount = 0;
 
 bool isOnBoard = true;
 bool isOnDiscard = false;
@@ -48,8 +52,11 @@ bool flipIsSelected = false;
 SpriteSlot background;
 SpriteSlot testSlot;
 SpriteSlot textSlot;
+SpriteSlot remainingCards;
 
 char *selectionText = "Selected Card 1: ";
+
+bool hasWon() { return remainingCardCount == 0; }
 
 void scanForEligibility() {
   int row, col, entry;
@@ -194,6 +201,7 @@ void loadPyramidBoard() {
     }
     counter++;
   }
+  remainingCardCount = num;
   discardPtr = DISCARD_BEGINS;
 }
 
@@ -236,11 +244,14 @@ int getvalue(int cardno) {
 }
 
 void initializePyramidScene() {
-  //background = allocate_sprite(&ASSET__backgrounds__background_bmp_load_list);
+  // background =
+  // allocate_sprite(&ASSET__backgrounds__background_bmp_load_list);
   background = allocate_sprite(&ASSET__backgrounds__background2_bmp_load_list);
   testSlot = allocate_sprite(&ASSET__cardframes__frame_deck_bmp_load_list);
+  remainingCards = allocate_sprite(&ASSET__numbers__generalnums_bmp_load_list);
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
+  set_sprite_frametable(remainingCards, &ASSET__numbers__generalnums_json);
   loadPyramidDeck(&deck);
   shufflePyramidDeck(&deck, RANDOM_SEED);
   loadPyramidBoard();
@@ -272,7 +283,6 @@ void checkSelection() {
           cardTwo = board[rows][cols];
           value2 = getvalue(cardTwo + 1);
         }
-        // select[rows][cols] = 0;
       }
     }
   }
@@ -282,17 +292,15 @@ void checkSelection() {
     total = value1 + getvalue(deck[discardPtr] + 1);
   }
 
-  /*if (value1 == 13) {
-    removeCardFromBoard(cardOne);
-    resetSelections();
-    determineSelectability();
-    if (isOnBoard) {
-      moveRight();
-    }
-  } else */
   if (13 == total) {
-    removeCardFromBoard(cardOne);
-    removeCardFromBoard(cardTwo);
+    if (cardOne != 0) {
+      removeCardFromBoard(cardOne);
+      remainingCardCount--;
+    }
+    if (cardTwo != 0) {
+      removeCardFromBoard(cardTwo);
+      remainingCardCount--;
+    }
     if (flipIsSelected) {
       deck[discardPtr] = 0;
       moveBackDiscard();
@@ -374,8 +382,8 @@ void renderPyramidBoard() {
         }
         // If the card we are is has a selection flag on it
         if (select[rows][cols] & 1) {
-          queue_draw_sprite_frame(testSlot, cardx, cardy + SELECT_SHIFT, board[rows][cols],
-                                  false);
+          queue_draw_sprite_frame(testSlot, cardx, cardy + SELECT_SHIFT,
+                                  board[rows][cols], false);
         } else {
           queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols],
                                   false);
@@ -394,8 +402,8 @@ void renderPyramidBoard() {
   queue_draw_sprite_frame(testSlot, DISCARD_PILE_X, DISCARD_PILE_Y, 0, false);
   if (discardPtr > DISCARD_BEGINS) {
     if (flipIsSelected) {
-      queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X + SELECT_SHIFT, FLIPPED_PILE_Y,
-                              deck[discardPtr], false);
+      queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X + SELECT_SHIFT,
+                              FLIPPED_PILE_Y, deck[discardPtr], false);
     } else {
       queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y,
                               deck[discardPtr], false);
@@ -403,6 +411,9 @@ void renderPyramidBoard() {
   } else {
     queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y, 0, false);
   }
+
+  queue_draw_sprite_frame(remainingCards, SCORE_X, SCORE_Y, remainingCardCount,
+                          false);
 
   checkInput();
 }
