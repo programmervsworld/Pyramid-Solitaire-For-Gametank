@@ -2,6 +2,7 @@
 #define CARDS_H
 
 #include "../gen/assets/backgrounds.h"
+#include "../gen/assets/cardframes.h"
 #include "../gen/assets/numbers.h"
 #include "gt/feature/random/random.h"
 #include "input.h"
@@ -22,7 +23,7 @@ typedef struct {
 } CardPosition;
 
 // These two arrays just hold the cards positions in the tableau grid.
-char divy[] = {12, 28, 44, 60, 76, 92, 108};
+static const char divy[] = {12, 28, 44, 60, 76, 92, 108};
 
 // This is the playfield
 char board[7][7];
@@ -30,7 +31,7 @@ char select[7][7];
 CardPosition eligibileCards[7];
 
 // The is the deck that we deal from and where the next discard will come from
-int deck[52];
+unsigned char deck[52];
 char discardPtr = 0;
 char cursorRow = 6;
 char cursorCard = 0;
@@ -47,8 +48,6 @@ bool flipIsSelected = false;
 SpriteSlot background;
 SpriteSlot testSlot;
 SpriteSlot remainingCards;
-
-char *selectionText = "Selected Card 1: ";
 
 bool hasWon() { return remainingCardCount == 0; }
 
@@ -163,14 +162,6 @@ void removeCard(char row, char col, char search) {
   }
 }
 
-void canSelect(char row, char col, char search) {
-  if (row == 7 && board[row][col] > 0) {
-    select[row][col] |= 2;
-  } else {
-    select[row][col] |= 2;
-  }
-}
-
 void resetSelections() {
   iterateBoard(zeroRecord, 0);
   numSelections = 0;
@@ -182,8 +173,6 @@ void removeCardFromBoard(char cardNo) {
     iterateBoard(removeCard, cardNo);
   }
 }
-
-void determineSelectability() { iterateBoard(canSelect, 0); }
 
 void loadPyramidBoard() {
   char r, c, num, counter;
@@ -200,14 +189,14 @@ void loadPyramidBoard() {
   discardPtr = DISCARD_BEGINS;
 }
 
-void loadPyramidDeck(char *deck[]) {
+void loadPyramidDeck(unsigned char *deck) {
   char i = 0;
   for (i = 1; i < 52; i++) {
     deck[i - 1] = i;
   }
 }
 
-void shufflePyramidDeck(char *cards[], char times) {
+void shufflePyramidDeck(unsigned char *cards, unsigned char times) {
   char valueToSwap;
   char indexToSwap;
   char i, t;
@@ -231,19 +220,15 @@ int getvalue(char cardno) {
 }
 
 void initializePyramidScene() {
-  // background =
-  // allocate_sprite(&ASSET__backgrounds__background_bmp_load_list);
   background = allocate_sprite(&ASSET__backgrounds__background2_bmp_load_list);
   testSlot = allocate_sprite(&ASSET__cardframes__frame_deck_bmp_load_list);
   remainingCards = allocate_sprite(&ASSET__numbers__generalnums_bmp_load_list);
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
-  set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
   set_sprite_frametable(remainingCards, &ASSET__numbers__generalnums_json);
-  loadPyramidDeck(&deck);
-  shufflePyramidDeck(&deck, RANDOM_SEED);
+  loadPyramidDeck(deck);
+  shufflePyramidDeck(deck, RANDOM_SEED);
   loadPyramidBoard();
   resetSelections();
-  determineSelectability();
   scanForEligibility();
 }
 
@@ -287,7 +272,7 @@ void checkSelection() {
       moveBackDiscard();
     }
     resetSelections();
-    determineSelectability();
+    //determineSelectability();
     scanForEligibility();
     if (isOnBoard) {
       moveLeftUsingEligibility();

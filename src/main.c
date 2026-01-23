@@ -1,4 +1,4 @@
-#include "../gen/assets/cardframes.h"
+
 #include "gt/gametank.h"
 #include "gt/gfx/draw_queue.h"
 #include "pyramid.h"
