@@ -7,11 +7,12 @@
 #include "input.h"
 
 #define DISCARD_PILE_X 48
-#define DISCARD_PILE_Y 112
+#define DISCARD_PILE_Y 104
 #define FLIPPED_PILE_X 80
-#define FLIPPED_PILE_Y 112
+#define FLIPPED_PILE_Y 104
 #define DISCARD_BEGINS 27
 #define RANDOM_SEED 9
+#define SELECT_SHIFT 5
 
 typedef struct {
   int row;
@@ -23,7 +24,7 @@ int values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
 // These two arrays just hold the cards positions in the tableau grid.
 int divx[] = {16, 32, 48, 64, 80, 96, 112};
-int divy[] = {16, 32, 48, 64, 80, 96, 112};
+int divy[] = {12, 28, 44, 60, 76, 92, 108};
 
 // This is the playfield
 int board[7][7];
@@ -235,7 +236,8 @@ int getvalue(int cardno) {
 }
 
 void initializePyramidScene() {
-  background = allocate_sprite(&ASSET__backgrounds__background_bmp_load_list);
+  //background = allocate_sprite(&ASSET__backgrounds__background_bmp_load_list);
+  background = allocate_sprite(&ASSET__backgrounds__background2_bmp_load_list);
   testSlot = allocate_sprite(&ASSET__cardframes__frame_deck_bmp_load_list);
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(background, &ASSET__backgrounds__background1_json);
@@ -372,7 +374,7 @@ void renderPyramidBoard() {
         }
         // If the card we are is has a selection flag on it
         if (select[rows][cols] & 1) {
-          queue_draw_sprite_frame(testSlot, cardx, cardy + 8, board[rows][cols],
+          queue_draw_sprite_frame(testSlot, cardx, cardy + SELECT_SHIFT, board[rows][cols],
                                   false);
         } else {
           queue_draw_sprite_frame(testSlot, cardx, cardy, board[rows][cols],
@@ -392,7 +394,7 @@ void renderPyramidBoard() {
   queue_draw_sprite_frame(testSlot, DISCARD_PILE_X, DISCARD_PILE_Y, 0, false);
   if (discardPtr > DISCARD_BEGINS) {
     if (flipIsSelected) {
-      queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X + 8, FLIPPED_PILE_Y,
+      queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X + SELECT_SHIFT, FLIPPED_PILE_Y,
                               deck[discardPtr], false);
     } else {
       queue_draw_sprite_frame(testSlot, FLIPPED_PILE_X, FLIPPED_PILE_Y,
