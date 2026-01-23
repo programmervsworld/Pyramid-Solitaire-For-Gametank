@@ -4,7 +4,6 @@
 #include "../gen/assets/backgrounds.h"
 #include "../gen/assets/numbers.h"
 #include "gt/feature/random/random.h"
-#include "gt/feature/text/text.h"
 #include "input.h"
 
 #define DISCARD_PILE_X 48
@@ -18,31 +17,27 @@
 #define SCORE_Y 17
 
 typedef struct {
-  int row;
-  int card;
+  char row;
+  char card;
 } CardPosition;
 
-// Used as a value table for figuring out what cards total to 13
-int values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-
 // These two arrays just hold the cards positions in the tableau grid.
-int divx[] = {16, 32, 48, 64, 80, 96, 112};
-int divy[] = {12, 28, 44, 60, 76, 92, 108};
+char divy[] = {12, 28, 44, 60, 76, 92, 108};
 
 // This is the playfield
-int board[7][7];
-int select[7][7];
+char board[7][7];
+char select[7][7];
 CardPosition eligibileCards[7];
 
 // The is the deck that we deal from and where the next discard will come from
 int deck[52];
-int discardPtr = 0;
-int cursorRow = 6;
-int cursorCard = 0;
-int eligPos = 0;
-int eligCount = 7;
-int numSelections = 0;
-int deckflips = 0;
+char discardPtr = 0;
+char cursorRow = 6;
+char cursorCard = 0;
+char eligPos = 0;
+char eligCount = 7;
+char numSelections = 0;
+char deckflips = 0;
 char remainingCardCount = 0;
 
 bool isOnBoard = true;
@@ -51,7 +46,6 @@ bool flipIsSelected = false;
 
 SpriteSlot background;
 SpriteSlot testSlot;
-SpriteSlot textSlot;
 SpriteSlot remainingCards;
 
 char *selectionText = "Selected Card 1: ";
@@ -59,7 +53,7 @@ char *selectionText = "Selected Card 1: ";
 bool hasWon() { return remainingCardCount == 0; }
 
 void scanForEligibility() {
-  int row, col, entry;
+  char row, col, entry;
   for (entry = 0; entry < 6; entry++) {
     CardPosition pos;
     eligibileCards[entry] = pos;
@@ -150,8 +144,9 @@ void advanceNextDiscard() {
   }
 }
 
-void iterateBoard(void (*execute)(int row, int col, int search), int search) {
-  int rows, cols;
+void iterateBoard(void (*execute)(char row, char col, char search),
+                  char search) {
+  char rows, cols;
 
   for (rows = 0; rows < 7; rows++) {
     for (cols = 0; cols < 7; cols++) {
@@ -160,15 +155,15 @@ void iterateBoard(void (*execute)(int row, int col, int search), int search) {
   }
 }
 
-void zeroRecord(int row, int col, int search) { select[row][col] = 0; }
+void zeroRecord(char row, char col, char search) { select[row][col] = 0; }
 
-void removeCard(int row, int col, int search) {
+void removeCard(char row, char col, char search) {
   if (board[row][col] == search) {
     board[row][col] = 0;
   }
 }
 
-void canSelect(int row, int col, int search) {
+void canSelect(char row, char col, char search) {
   if (row == 7 && board[row][col] > 0) {
     select[row][col] |= 2;
   } else {
@@ -182,7 +177,7 @@ void resetSelections() {
   flipIsSelected = false;
 }
 
-void removeCardFromBoard(int cardNo) {
+void removeCardFromBoard(char cardNo) {
   if (cardNo > 0) {
     iterateBoard(removeCard, cardNo);
   }
@@ -191,7 +186,7 @@ void removeCardFromBoard(int cardNo) {
 void determineSelectability() { iterateBoard(canSelect, 0); }
 
 void loadPyramidBoard() {
-  int r, c, num, counter;
+  char r, c, num, counter;
   num = 0;
   counter = 1;
   for (r = 0; r < 7; r++) {
@@ -205,17 +200,17 @@ void loadPyramidBoard() {
   discardPtr = DISCARD_BEGINS;
 }
 
-void loadPyramidDeck(int *deck[]) {
-  int i = 0;
+void loadPyramidDeck(char *deck[]) {
+  char i = 0;
   for (i = 1; i < 52; i++) {
     deck[i - 1] = i;
   }
 }
 
-void shufflePyramidDeck(int *cards[], int times) {
-  int valueToSwap;
-  int indexToSwap;
-  int i, t;
+void shufflePyramidDeck(char *cards[], char times) {
+  char valueToSwap;
+  char indexToSwap;
+  char i, t;
 
   for (t = 0; t < times; t++) {
     for (i = 0; i < 51; i++) {
@@ -227,16 +222,8 @@ void shufflePyramidDeck(int *cards[], int times) {
   }
 }
 
-void draw_selection() {
-  text_init();
-  text_cursor_x = 1;
-  text_cursor_y = 7;
-  text_color = TEXT_COLOR_BLACK;
-  text_print_string(selectionText);
-}
-
-int getvalue(int cardno) {
-  int value = cardno % 13;
+int getvalue(char cardno) {
+  char value = cardno % 13;
   if (value == 0) {
     value = 13;
   }
@@ -258,16 +245,10 @@ void initializePyramidScene() {
   resetSelections();
   determineSelectability();
   scanForEligibility();
-
-  text_init();
-  text_load_font();
-  text_color = TEXT_COLOR_BLACK;
-  text_print_line_start = 10;
-  text_print_width = 128;
 }
 
 void checkSelection() {
-  int cardOne, cardTwo, rows, cols, value1, value2, total;
+  char cardOne, cardTwo, rows, cols, value1, value2, total;
   cardOne = 0;
   cardTwo = 0;
   value1 = 0;
@@ -357,8 +338,14 @@ void checkInput() {
   }
 }
 
-void renderPyramidBoard() {
-  int rows, cols, cardx, cardy, counter;
+void checkInputFromWin() {
+  if (player1_new_buttons & INPUT_MASK_A) {
+    initializePyramidScene();
+  }
+}
+
+void renderPyramidBoardNormal() {
+  char rows, cols, cardx, cardy, counter;
 
   counter = 1;
   cardx = 64;
@@ -416,6 +403,24 @@ void renderPyramidBoard() {
                           false);
 
   checkInput();
+}
+
+void renderWinSequence() {
+  char deckpos;
+  queue_clear_screen(rnd_range(0, 255));
+  for (deckpos = 0; deckpos < 52; deckpos++) {
+    queue_draw_sprite_frame(testSlot, rnd_range(8, 120), rnd_range(8, 120),
+                            deckpos, false);
+  }
+  checkInputFromWin();
+}
+
+void renderPyramidBoard() {
+  if (hasWon()) {
+    renderWinSequence();
+  } else {
+    renderPyramidBoardNormal();
+  }
 }
 
 #endif
