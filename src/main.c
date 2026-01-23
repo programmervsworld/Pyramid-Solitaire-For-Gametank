@@ -1,6 +1,8 @@
 
 #include "gt/gametank.h"
 #include "gt/gfx/draw_queue.h"
+#include "gt/audio/audio_coprocessor.h"
+#include "gt/audio/music.h"
 #include "pyramid.h"
 
 #define PIXEL_WIDTH 128
@@ -25,6 +27,9 @@ void main() {
 
   scenes[currentScene].initialize();
 
+  init_audio_coprocessor();
+  init_music();
+
   //  Run forever
   while (1) {
     queue_clear_screen(3);
@@ -37,6 +42,7 @@ void main() {
     await_vsync(1);
     
     flip_pages();
+    tick_music();
     update_inputs();
   }
 }

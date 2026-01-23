@@ -4,6 +4,7 @@
 #include "../gen/assets/backgrounds.h"
 #include "../gen/assets/cardframes.h"
 #include "../gen/assets/numbers.h"
+#include "../gen/assets/sfx.h"
 #include "gt/feature/random/random.h"
 #include "input.h"
 
@@ -259,6 +260,7 @@ void checkSelection() {
   }
 
   if (13 == total) {
+    play_sound_effect(ASSET__sfx__accept_sfx_ID, 1);
     if (cardOne != 0) {
       removeCardFromBoard(cardOne);
       remainingCardCount--;
@@ -295,6 +297,7 @@ void checkInput() {
     cursorCard = 0;
     moveLeftUsingEligibility();
   } else if (player1_new_buttons & INPUT_MASK_B) {
+    play_sound_effect(ASSET__sfx__flip_sfx_ID, 1);
     resetSelections();
   } else if (player1_new_buttons & INPUT_MASK_A) {
     if (numSelections < 2) {
@@ -302,7 +305,7 @@ void checkInput() {
         flipIsSelected = true;
         numSelections++;
       } else {
-
+        play_sound_effect(ASSET__sfx__blip2_sfx_ID, 1);
         select[cursorRow][cursorCard] = 1;
         numSelections++;
       }
@@ -313,12 +316,14 @@ void checkInput() {
         flipIsSelected = true;
         numSelections++;
       } else {
+        play_sound_effect(ASSET__sfx__blip2_sfx_ID, 1);
         select[cursorRow][cursorCard] = 1;
         numSelections++;
       }
     }
     checkSelection();
   } else if (player1_new_buttons & INPUT_MASK_C) {
+    play_sound_effect(ASSET__sfx__blip_sfx_ID, 1);
     advanceNextDiscard();
   }
 }
