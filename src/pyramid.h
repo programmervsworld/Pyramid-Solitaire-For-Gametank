@@ -13,7 +13,7 @@
 #define FLIPPED_PILE_X 80
 #define FLIPPED_PILE_Y 104
 #define DISCARD_BEGINS 27
-#define RANDOM_SEED 9
+#define SHUFFLE_SEED 9
 #define SELECT_SHIFT 5
 #define SCORE_X 103
 #define SCORE_Y 17
@@ -227,7 +227,7 @@ void initializePyramidScene() {
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(remainingCards, &ASSET__numbers__generalnums_json);
   loadPyramidDeck(deck);
-  shufflePyramidDeck(deck, RANDOM_SEED);
+  shufflePyramidDeck(deck, SHUFFLE_SEED);
   loadPyramidBoard();
   resetSelections();
   scanForEligibility();
@@ -274,7 +274,7 @@ void checkSelection() {
       moveBackDiscard();
     }
     resetSelections();
-    //determineSelectability();
+    // determineSelectability();
     scanForEligibility();
     if (isOnBoard) {
       moveLeftUsingEligibility();
