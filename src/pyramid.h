@@ -19,7 +19,7 @@
 #define SELECT_SHIFT 5
 #define SCORE_X 103
 #define SCORE_Y 17
-#define MAX_DECK_FLIPS 1
+#define MAX_DECK_FLIPS 3
 
 typedef struct {
   char row;
@@ -33,6 +33,10 @@ static const char divy[] = {12, 28, 44, 60, 76, 92, 108};
 char board[7][7];
 char select[7][7];
 CardPosition eligibileCards[7];
+char animationx[52];
+char animationy[52];
+char directionx[52];
+char directiony[52];
 
 // The is the deck that we deal from and where the next discard will come from
 unsigned char deck[52];
@@ -44,12 +48,14 @@ char eligCount = 7;
 char numSelections = 0;
 char deckflips = 0;
 char remainingCardCount = 0;
+char wxpos = 64, wypos = 64;
 
 bool isOnBoard = true;
 bool isOnDiscard = false;
 bool flipIsSelected = false;
 
 SpriteSlot background;
+SpriteSlot winBack;
 SpriteSlot testSlot;
 SpriteSlot remainingCards;
 
@@ -198,6 +204,10 @@ void loadPyramidDeck(unsigned char *deck) {
   char i = 0;
   for (i = 1; i < 52; i++) {
     deck[i - 1] = i;
+    animationx[i - 1] = 64;
+    animationy[i - 1] = 64;
+    directionx[i - 1] = rnd_range(-8, 8);
+    directiony[i - 1] = rnd_range(-8, 8);
   }
 }
 
@@ -228,12 +238,14 @@ void initializePyramidScene() {
   background = allocate_sprite(&ASSET__backgrounds__background2_bmp_load_list);
   testSlot = allocate_sprite(&ASSET__cardframes__frame_deck_bmp_load_list);
   remainingCards = allocate_sprite(&ASSET__numbers__generalnums_bmp_load_list);
+  winBack = allocate_sprite(&ASSET__backgrounds__winback_bmp_load_list);
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(remainingCards, &ASSET__numbers__generalnums_json);
   remainingCardCount = 0;
   deckflips = 0;
 
   loadPyramidDeck(deck);
+  //rnd_seed = 234;
   shufflePyramidDeck(deck, SHUFFLE_SEED);
   loadPyramidBoard();
   resetSelections();
@@ -403,11 +415,35 @@ void renderPyramidBoardNormal() {
 }
 
 void renderWinSequence() {
+
   char deckpos;
-  queue_clear_screen(rnd_range(0, 255));
+  // queue_clear_screen(rnd_range(0, 255));
+  queue_draw_sprite(0, 0, 127, 127, 0, 0, winBack);
+
   for (deckpos = 0; deckpos < 52; deckpos++) {
-    queue_draw_sprite_frame(testSlot, rnd_range(8, 120), rnd_range(8, 120),
+    if (directionx[deckpos] == 0)
+      directionx[deckpos] = 1;
+    if (directiony[deckpos] == 0)
+      directiony[deckpos] = 1;
+    animationx[deckpos] += directionx[deckpos];
+    animationy[deckpos] += directiony[deckpos];
+
+    if (animationx[deckpos] == 8) {
+      directionx[deckpos] = 1;
+    } else if (animationx[deckpos] == 120) {
+      directionx[deckpos] = -1;
+    }
+
+    if (animationy[deckpos] == 8) {
+      directiony[deckpos] = 1;
+    } else if (animationy[deckpos] == 112) {
+      directiony[deckpos] = -1;
+    }
+
+    queue_draw_sprite_frame(testSlot, animationx[deckpos], animationy[deckpos],
                             deckpos, false);
+    // queue_draw_sprite_frame(testSlot, rnd_range(8, 110), rnd_range(8, 110),
+    // deckpos, false);
   }
   checkInputFromWin();
 }
