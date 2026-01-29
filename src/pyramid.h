@@ -322,6 +322,7 @@ void checkInput() {
     if (numSelections < 2) {
       if (isOnDiscard) {
         flipIsSelected = true;
+        play_sound_effect(ASSET__sfx__blip2_sfx_ID, 1);
         numSelections++;
       } else {
         play_sound_effect(ASSET__sfx__blip2_sfx_ID, 1);
@@ -333,6 +334,8 @@ void checkInput() {
 
       if (isOnDiscard) {
         flipIsSelected = true;
+        play_sound_effect(ASSET__sfx__blip2_sfx_ID, 2);
+
         numSelections++;
       } else {
         play_sound_effect(ASSET__sfx__blip2_sfx_ID, 1);
