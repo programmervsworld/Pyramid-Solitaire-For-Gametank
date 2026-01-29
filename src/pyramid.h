@@ -5,7 +5,9 @@
 #include "../gen/assets/cardframes.h"
 #include "../gen/assets/numbers.h"
 #include "../gen/assets/sfx.h"
+#include "gametank.h"
 #include "gt/feature/random/random.h"
+#include "gt/gfx/draw_queue.h"
 #include "input.h"
 
 #define DISCARD_PILE_X 48
@@ -17,6 +19,7 @@
 #define SELECT_SHIFT 5
 #define SCORE_X 103
 #define SCORE_Y 17
+#define MAX_DECK_FLIPS 1
 
 typedef struct {
   char row;
@@ -51,6 +54,7 @@ SpriteSlot testSlot;
 SpriteSlot remainingCards;
 
 bool hasWon() { return remainingCardCount == 0; }
+bool hasLost() { return deckflips == MAX_DECK_FLIPS; }
 
 void scanForEligibility() {
   char row, col, entry;
@@ -128,7 +132,7 @@ void advanceNextDiscard() {
   bool searching = true;
 
   while (searching) {
-    if (deckflips == 3) {
+    if (deckflips == MAX_DECK_FLIPS) {
       searching = false;
       break;
       // Game over
@@ -226,6 +230,9 @@ void initializePyramidScene() {
   remainingCards = allocate_sprite(&ASSET__numbers__generalnums_bmp_load_list);
   set_sprite_frametable(testSlot, &ASSET__cardframes__frame_deck_json);
   set_sprite_frametable(remainingCards, &ASSET__numbers__generalnums_json);
+  remainingCardCount = 0;
+  deckflips = 0;
+
   loadPyramidDeck(deck);
   shufflePyramidDeck(deck, SHUFFLE_SEED);
   loadPyramidBoard();
@@ -329,7 +336,7 @@ void checkInput() {
 }
 
 void checkInputFromWin() {
-  if (player1_new_buttons & INPUT_MASK_A) {
+  if (player1_new_buttons & INPUT_MASK_START) {
     initializePyramidScene();
   }
 }
@@ -406,10 +413,28 @@ void renderWinSequence() {
 }
 
 void renderPyramidBoard() {
-  if (hasWon()) {
-    renderWinSequence();
-  } else {
-    renderPyramidBoardNormal();
+  bool isRunning = true;
+  initializePyramidScene();
+
+  while (isRunning) {
+    queue_clear_screen(0);
+    queue_clear_border(0);
+
+    if (hasWon()) {
+      renderWinSequence();
+    } else if (hasLost()) {
+      isRunning = false;
+    } else {
+      renderPyramidBoardNormal();
+    }
+
+    await_draw_queue();
+
+    await_vsync(1);
+
+    flip_pages();
+    tick_music();
+    update_inputs();
   }
 }
 

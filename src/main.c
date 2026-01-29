@@ -17,24 +17,15 @@ void main() {
   char seed = renderIntroScreen();
   rnd_seed = seed;
 
-  initializePyramidScene();
+  // initializePyramidScene();
 
   init_audio_coprocessor();
   init_music();
 
   //  Run forever
   while (1) {
-    queue_clear_screen(3);
-    queue_clear_border(0);
-
     renderPyramidBoard();
 
-    await_draw_queue();
-
-    await_vsync(1);
-
-    flip_pages();
-    tick_music();
-    update_inputs();
+    rnd_seed = renderLoseScreen();
   }
 }
